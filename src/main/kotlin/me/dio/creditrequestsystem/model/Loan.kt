@@ -10,10 +10,10 @@ import java.util.UUID
 @Entity
 data class Loan(
     @Column(nullable = false, unique = true)
-    val loanCode: UUID = UUID.randomUUID(),
+    val creditCode: UUID = UUID.randomUUID(),
 
     @Column(nullable = false)
-    val amount: BigDecimal = BigDecimal.ZERO,
+    val creditAmount: BigDecimal = BigDecimal.ZERO,
 
     @Column(nullable = false)
     val dateOfFirstInstallment: LocalDate,
@@ -25,7 +25,7 @@ data class Loan(
     val status: Status = Status.PENDING,
 
     @ManyToOne
-    val customer: Customer? = null,
+    var customer: Customer? = null,
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
