@@ -1,4 +1,4 @@
-package service
+package me.dio.creditrequestsystem.service
 
 import me.dio.creditrequestsystem.model.Loan
 import java.util.UUID

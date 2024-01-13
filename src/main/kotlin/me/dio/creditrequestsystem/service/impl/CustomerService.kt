@@ -1,9 +1,9 @@
-package service.impl
+package me.dio.creditrequestsystem.service.impl
 
 import me.dio.creditrequestsystem.model.Customer
 import me.dio.creditrequestsystem.repository.CustomerRepository
 import org.springframework.stereotype.Service
-import service.ICustomerService
+import me.dio.creditrequestsystem.service.ICustomerService
 
 @Service
 class CustomerService(

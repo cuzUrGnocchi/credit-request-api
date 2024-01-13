@@ -1,9 +1,9 @@
-package service.impl
+package me.dio.creditrequestsystem.service.impl
 
 import me.dio.creditrequestsystem.model.Loan
 import me.dio.creditrequestsystem.repository.LoanRepository
 import org.springframework.stereotype.Service
-import service.ILoanService
+import me.dio.creditrequestsystem.service.ILoanService
 import java.util.*
 
 @Service

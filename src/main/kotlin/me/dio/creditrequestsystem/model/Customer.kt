@@ -2,26 +2,23 @@ package me.dio.creditrequestsystem.model
 
 import jakarta.persistence.*
 import org.hibernate.proxy.HibernateProxy
+import java.math.BigDecimal
 
 @Entity
 data class Customer(
-    @Column(nullable = false)
-    var firstName: String = "",
+    @Column(nullable = false) var firstName: String = "",
 
-    @Column(nullable = false)
-    var lastName: String = "",
+    @Column(nullable = false) var lastName: String = "",
 
-    @Column(nullable = false, unique = true)
-    val cpf: String,
+    @Column(nullable = false, unique = true) val cpf: String = "",
 
-    @Column(nullable = false, unique = true)
-    var email: String = "",
+    @Column(nullable = false, unique = true) var email: String = "",
 
-    @Column(nullable = false)
-    var password: String = "",
+    @Column(nullable = false) var income: BigDecimal = BigDecimal.ZERO,
 
-    @Embedded @Column(nullable = false)
-    val address: Address = Address(),
+    @Column(nullable = false) var password: String = "",
+
+    @Embedded @Column(nullable = false) val address: Address = Address(),
 
     @Column(nullable = false)
     @OneToMany(
@@ -29,10 +26,9 @@ data class Customer(
         cascade = [CascadeType.REMOVE, CascadeType.PERSIST],
         mappedBy = "customer"
     )
-    var loans: List<Loan>,
+    var loans: List<Loan> = listOf(),
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long? = null,
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Long? = null,
 ) {
     final override fun equals(other: Any?): Boolean {
         if (this === other) return true
