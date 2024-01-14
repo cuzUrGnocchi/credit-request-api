@@ -17,7 +17,7 @@ import java.util.UUID
 import java.util.stream.Collectors
 
 @RestController
-@RequestMapping("/api/")
+@RequestMapping("/api/loans")
 class LoanController(
     private val loanService: LoanService
 ) {
@@ -26,7 +26,7 @@ class LoanController(
         loanService.save(valueToStore.toEntity()).run {
             ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body("Loan $creditCode - Customer ${customer?.firstName} saved!")
+                .body("Loan $creditCode - Customer ${customer?.email} saved!")
         }
 
     @GetMapping
