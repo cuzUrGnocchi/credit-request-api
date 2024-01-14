@@ -20,13 +20,9 @@ data class Customer(
 
     @Embedded @Column(nullable = false) val address: Address = Address(),
 
-    @Column(nullable = false)
-    @OneToMany(
-        fetch = FetchType.LAZY,
-        cascade = [CascadeType.REMOVE, CascadeType.PERSIST],
-        mappedBy = "customer"
-    )
-    var loans: List<Loan> = listOf(),
+    @Column(nullable = false) @OneToMany(
+        fetch = FetchType.LAZY, cascade = [CascadeType.REMOVE, CascadeType.PERSIST], mappedBy = "customer"
+    ) var loans: List<Loan> = listOf(),
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Long? = null,
 ) {

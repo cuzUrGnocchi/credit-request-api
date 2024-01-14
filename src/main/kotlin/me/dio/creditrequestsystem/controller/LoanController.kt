@@ -1,5 +1,6 @@
 package me.dio.creditrequestsystem.controller
 
+import jakarta.validation.Valid
 import me.dio.creditrequestsystem.dto.LoanDTO
 import me.dio.creditrequestsystem.dto.LoanListItemView
 import me.dio.creditrequestsystem.dto.LoanView
@@ -22,35 +23,23 @@ class LoanController(
     private val loanService: LoanService
 ) {
     @PostMapping
-    fun saveLoan(@RequestBody valueToStore: LoanDTO): ResponseEntity<String> =
+    fun saveLoan(@RequestBody @Valid valueToStore: LoanDTO): ResponseEntity<String> =
         loanService.save(valueToStore.toEntity()).run {
-            ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body("Loan $creditCode - Customer ${customer?.email} saved!")
+            ResponseEntity.status(HttpStatus.CREATED).body("Loan $creditCode - Customer ${customer?.email} saved!")
         }
 
     @GetMapping
     fun findAllByCustomerId(@RequestParam(value = "customerId") customerId: Long): ResponseEntity<List<LoanListItemView>> =
         loanService.findAllByCustomer(customerId).let { loanList ->
-            ResponseEntity
-                .status(HttpStatus.OK)
-                .body(
-                    loanList
-                        .stream()
-                        .map { item -> LoanListItemView(item) }
-                        .collect(Collectors.toList())
-                )
+            ResponseEntity.status(HttpStatus.OK)
+                .body(loanList.stream().map { item -> LoanListItemView(item) }.collect(Collectors.toList()))
         }
 
     @GetMapping("/{creditCode}")
     fun findByCreditCode(
-        @RequestParam(value = "customerId") customerId: Long,
-        @PathVariable creditCode: UUID
-    ): ResponseEntity<LoanView> =
-        loanService.findByCreditCode(customerId, creditCode).let {
-            ResponseEntity
-                .status(HttpStatus.OK)
-                .body(LoanView(it))
-        }
+        @RequestParam(value = "customerId") customerId: Long, @PathVariable creditCode: UUID
+    ): ResponseEntity<LoanView> = loanService.findByCreditCode(customerId, creditCode).let {
+        ResponseEntity.status(HttpStatus.OK).body(LoanView(it))
+    }
 
 }
