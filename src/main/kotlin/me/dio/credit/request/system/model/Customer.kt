@@ -1,28 +1,29 @@
 package me.dio.credit.request.system.model
 
 import jakarta.persistence.*
+import jakarta.validation.constraints.NotEmpty
 import org.hibernate.proxy.HibernateProxy
 import java.math.BigDecimal
 
 @Entity
 data class Customer(
     @Column(nullable = false)
-    var firstName: String = "",
+    var firstName: String,
 
     @Column(nullable = false)
-    var lastName: String = "",
+    var lastName: String,
 
     @Column(nullable = false, unique = true)
-    val cpf: String = "",
+    val cpf: String,
 
     @Column(nullable = false, unique = true)
-    var email: String = "",
+    var email: String,
 
     @Column(nullable = false)
-    var income: BigDecimal = BigDecimal.ZERO,
+    var income: BigDecimal,
 
     @Column(nullable = false)
-    var password: String = "",
+    var password: String,
 
     @Embedded
     @Column(nullable = false)
@@ -36,6 +37,8 @@ data class Customer(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 ) {
+    constructor(id: Long): this("", "", "", "", BigDecimal.ZERO, "", Address(), mutableListOf(), id)
+
     final override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null) return false

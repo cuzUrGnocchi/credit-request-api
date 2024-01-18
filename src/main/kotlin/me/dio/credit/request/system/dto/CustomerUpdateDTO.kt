@@ -7,15 +7,20 @@ import me.dio.credit.request.system.model.Customer
 import java.math.BigDecimal
 
 data class CustomerUpdateDTO(
-    @field:NotEmpty(message = "firstName cannot be empty") val firstName: String,
+    @field:NotEmpty(message = "firstName cannot be empty")
+    val firstName: String,
 
-    @field:NotEmpty(message = "lastName cannot be empty") val lastName: String,
+    @field:NotEmpty(message = "lastName cannot be empty")
+    val lastName: String,
 
-    @field:NotNull(message = "income cannot be null") val income: BigDecimal,
+    @field:NotNull(message = "income cannot be null")
+    val income: BigDecimal,
 
-    @field:NotEmpty(message = "zipCode cannot be empty") val zipCode: String,
+    @field:NotEmpty(message = "zipCode cannot be empty")
+    val zipCode: String,
 
-    @field:NotEmpty(message = "street cannot be empty") val street: String
+    @field:NotEmpty(message = "street cannot be empty")
+    val street: String
 ) {
     fun toEntity(customer: Customer): Customer =
         customer.copy(

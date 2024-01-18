@@ -23,8 +23,8 @@ class LoanController(
     private val loanService: LoanService
 ) {
     @PostMapping
-    fun saveLoan(@RequestBody @Valid valueToStore: LoanDTO): ResponseEntity<String> =
-        loanService.save(valueToStore.toEntity()).run {
+    fun saveLoan(@RequestBody @Valid loanDTO: LoanDTO): ResponseEntity<String> =
+        loanService.save(loanDTO.toEntity()).run {
             ResponseEntity.status(HttpStatus.CREATED).body("Loan $creditCode - Customer ${customer?.email} saved!")
         }
 

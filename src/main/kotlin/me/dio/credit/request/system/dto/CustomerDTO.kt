@@ -9,21 +9,29 @@ import org.hibernate.validator.constraints.br.CPF
 import java.math.BigDecimal
 
 data class CustomerDTO(
-    @field:NotEmpty(message = "firstName cannot be empty") val firstName: String,
+    @field:NotEmpty(message = "firstName cannot be empty")
+    val firstName: String,
 
-    @field:NotEmpty(message = "lastName cannot be empty") val lastName: String,
+    @field:NotEmpty(message = "lastName cannot be empty")
+    val lastName: String,
 
-    @field:NotEmpty(message = "cpf cannot be empty") @field:CPF(message = "Invalid CPF") val cpf: String,
+    @field:NotEmpty(message = "cpf cannot be empty") @field:CPF(message = "Invalid CPF")
+    val cpf: String,
 
-    @field:NotNull(message = "income cannot be null") val income: BigDecimal,
+    @field:NotNull(message = "income cannot be null")
+    val income: BigDecimal,
 
-    @field:NotEmpty(message = "email cannot be empty") @field:Email(message = "Invalid Email") val email: String,
+    @field:NotEmpty(message = "email cannot be empty") @field:Email(message = "Invalid Email")
+    val email: String,
 
-    @field:NotEmpty(message = "password cannot be empty") val password: String,
+    @field:NotEmpty(message = "password cannot be empty")
+    val password: String,
 
-    @field:NotEmpty(message = "zipCode cannot be empty") val zipCode: String,
+    @field:NotEmpty(message = "zipCode cannot be empty")
+    val zipCode: String,
 
-    @field:NotEmpty(message = "street cannot be empty") val street: String,
+    @field:NotEmpty(message = "street cannot be empty")
+    val street: String,
 ) {
     fun toEntity(): Customer = Customer(
         firstName = this.firstName,

@@ -3,7 +3,7 @@ package me.dio.credit.request.system.dto
 import me.dio.credit.request.system.model.Customer
 import java.math.BigDecimal
 
-class CustomerView(
+data class CustomerView(
     val firstName: String,
     val lastName: String,
     val cpf: String,
