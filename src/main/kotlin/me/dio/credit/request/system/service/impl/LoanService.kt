@@ -13,9 +13,8 @@ class LoanService(
     private val customerService: CustomerService
 ): ILoanService {
     override fun save(loan: Loan): Loan {
-        loan.apply {
-            customer = customerService.findById(loan.customer?.id!!)
-        }
+        customerService.findById(loan.customer.id!!)
+
         return this.loanRepository.save(loan)
     }
 
