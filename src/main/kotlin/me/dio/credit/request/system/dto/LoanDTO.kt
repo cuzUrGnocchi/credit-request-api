@@ -2,6 +2,7 @@ package me.dio.credit.request.system.dto
 
 import jakarta.validation.constraints.Future
 import jakarta.validation.constraints.NotNull
+import jakarta.validation.constraints.Positive
 import me.dio.credit.request.system.model.Customer
 import me.dio.credit.request.system.model.Loan
 import java.math.BigDecimal
@@ -12,7 +13,7 @@ data class LoanDTO(
 
     @field:NotNull(message = "dateOfFirstInstallment cannot be empty") @field:Future val dateOfFirstInstallment: LocalDate,
 
-    @field:NotNull(message = "numberOfInstallments cannot be empty") val numberOfInstallments: Int,
+    @field:NotNull(message = "numberOfInstallments cannot be empty") @field:Positive val numberOfInstallments: Int,
 
     @field:NotNull(message = "customerId cannot be empty") val customerId: Long
 ) {

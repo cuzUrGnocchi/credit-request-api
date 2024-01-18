@@ -4,7 +4,7 @@ import me.dio.credit.request.system.model.Loan
 import java.util.UUID
 
 interface ILoanService {
-    fun save(credit: Loan): Loan
+    fun save(loan: Loan): Loan
     fun findAllByCustomer(customerId: Long): List<Loan>
     fun findByCreditCode(customerId: Long, creditCode: UUID): Loan
 }

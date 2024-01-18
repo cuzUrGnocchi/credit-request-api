@@ -23,7 +23,7 @@ class RestExceptionHandler {
 
         return ResponseEntity(
             ExceptionDetails(
-                title = "Method argument invalid",
+                title = "Invalid argument",
                 timestamp = LocalDateTime.now(),
                 status = HttpStatus.BAD_REQUEST.value(),
                 exception = exception.javaClass.toString(),
@@ -38,7 +38,7 @@ class RestExceptionHandler {
             ExceptionDetails(
                 title = "Constraint violated",
                 timestamp = LocalDateTime.now(),
-                status = HttpStatus.BAD_REQUEST.value(),
+                status = HttpStatus.CONFLICT.value(),
                 exception = exception.javaClass.toString(),
                 details = mapOf(exception.cause.toString() to exception.message)
             ), HttpStatus.CONFLICT

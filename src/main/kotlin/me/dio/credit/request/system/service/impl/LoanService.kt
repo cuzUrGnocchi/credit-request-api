@@ -12,11 +12,11 @@ class LoanService(
     private val loanRepository: LoanRepository,
     private val customerService: CustomerService
 ): ILoanService {
-    override fun save(credit: Loan): Loan {
-        credit.apply {
-            customer = customerService.findById(credit.customer?.id!!)
+    override fun save(loan: Loan): Loan {
+        loan.apply {
+            customer = customerService.findById(loan.customer?.id!!)
         }
-        return this.loanRepository.save(credit)
+        return this.loanRepository.save(loan)
     }
 
     override fun findAllByCustomer(customerId: Long): List<Loan> =
@@ -24,8 +24,9 @@ class LoanService(
 
     override fun findByCreditCode(customerId: Long, creditCode: UUID): Loan {
         return this.loanRepository.findByCreditCode(creditCode).run {
-            if (this == null) throw BusinessException("Credit code $creditCode not found")
-            if (this.customer?.id != customerId) throw IllegalArgumentException("Contact admin")
+            if (this == null) throw BusinessException("Could not find any loan with credit code of $creditCode")
+            if (this.customer?.id != customerId)
+                throw IllegalArgumentException("Customer id of $customerId does not match that of the loan of credit code $creditCode")
             this
         }
     }

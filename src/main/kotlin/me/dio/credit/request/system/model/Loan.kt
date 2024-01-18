@@ -10,16 +10,16 @@ import java.util.UUID
 @Entity
 data class Loan(
     @Column(nullable = false, unique = true)
-    val creditCode: UUID = UUID.randomUUID(),
+    var creditCode: UUID = UUID.randomUUID(),
 
     @Column(nullable = false)
     val creditAmount: BigDecimal = BigDecimal.ZERO,
 
     @Column(nullable = false)
-    val dateOfFirstInstallment: LocalDate,
+    val dateOfFirstInstallment: LocalDate = LocalDate.now().plusWeeks(1),
 
     @Column(nullable = false)
-    val numberOfInstallments: Int = 0,
+    val numberOfInstallments: Int = 1,
 
     @Enumerated
     val status: Status = Status.PENDING,
