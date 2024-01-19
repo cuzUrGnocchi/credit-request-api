@@ -1,5 +1,9 @@
 package me.dio.credit.request.system.controller
 
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.responses.ApiResponses
 import jakarta.validation.Valid
 import me.dio.credit.request.system.dto.CustomerDTO
 import me.dio.credit.request.system.dto.CustomerUpdateDTO
