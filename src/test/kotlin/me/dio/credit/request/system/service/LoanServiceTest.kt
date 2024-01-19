@@ -35,7 +35,7 @@ class LoanServiceTest {
         val fakeLoan = buildLoan(customer = Customer(id = 0))
 
         every { loanRepository.save(fakeLoan) } returns fakeLoan
-        every { customerService.findById(any()) } returns fakeLoan.customer!!
+        every { customerService.findById(any()) } returns fakeLoan.customer
 
         val actual = loanService.save(fakeLoan)
 
@@ -47,7 +47,7 @@ class LoanServiceTest {
     @Test
     fun `findAllByCustomer(customerId) should return a list of loans`() {
         val fakeCustomerId = Random.nextLong()
-        val fakeLoans = arrayOf(0L, 1L, 2L, 3L).map { Loan(id = it) }
+        val fakeLoans = arrayOf(0L, 1L, 2L, 3L).map { buildLoan(id = it, customer = Customer(fakeCustomerId)) }
 
         every { loanRepository.findAllByCustomer(fakeCustomerId) } returns fakeLoans
 
@@ -109,7 +109,7 @@ class LoanServiceTest {
         dateOfFirstInstallment: LocalDate = LocalDate.now().plusWeeks(generateNumberRandomly(lowerLimit = 0, upperLimit = 4).toLong()),
         numberOfInstallments: Int = generateNumberRandomly(lowerLimit = 1, upperLimit = 49).toInt(),
         status: Status = Status.PENDING,
-        customer: Customer? = Customer(),
+        customer: Customer,
         id: Long? = null
     ) = Loan(
         creditCode = creditCode,

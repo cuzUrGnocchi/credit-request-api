@@ -105,25 +105,4 @@ class CustomerServiceTest {
         address = Address(zipCode = zipCode, street = street),
         id = id
     )
-
-    private fun buildLoan(
-        creditCode: UUID = UUID.randomUUID(),
-        creditAmount: BigDecimal = generateNumberRandomly(decimalPlaces = 2),
-        dateOfFirstInstallment: LocalDate = LocalDate.now().plusWeeks(generateNumberRandomly(lowerLimit = 0, upperLimit = 4).toLong()),
-        numberOfInstallments: Int = generateNumberRandomly(lowerLimit = 1, upperLimit = 49).toInt(),
-        status: Status = Status.PENDING,
-        customer: Customer? = Customer(),
-        id: Long? = null
-    ) = Loan(
-        creditCode = creditCode,
-        creditAmount = creditAmount,
-        dateOfFirstInstallment = dateOfFirstInstallment,
-        numberOfInstallments = numberOfInstallments,
-        status = status,
-        customer = customer,
-        id = id
-    )
-
-    private fun generateNumberRandomly(lowerLimit: Int = 0, upperLimit: Int = 10000, decimalPlaces: Int = 0): BigDecimal =
-        BigDecimal.valueOf(lowerLimit + Math.random() * (upperLimit - lowerLimit)).setScale(decimalPlaces, RoundingMode.HALF_DOWN)
 }

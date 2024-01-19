@@ -88,7 +88,7 @@ class LoanRepositoryTest {
         dateOfFirstInstallment: LocalDate = LocalDate.now().plusWeeks(generateNumberRandomly(lowerLimit = 0, upperLimit = 4).toLong()),
         numberOfInstallments: Int = generateNumberRandomly(lowerLimit = 1, upperLimit = 49).toInt(),
         status: Status = Status.PENDING,
-        customer: Customer? = Customer(),
+        customer: Customer,
         id: Long? = null
     ) = Loan(
         creditCode = creditCode,

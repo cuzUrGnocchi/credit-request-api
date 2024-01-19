@@ -28,16 +28,18 @@ import java.math.BigDecimal
 @AutoConfigureMockMvc
 @ContextConfiguration
 class CustomerControllerTest {
-    @Autowired private lateinit var customerRepository: CustomerRepository
-    @Autowired private lateinit var mockMvc: MockMvc
-    @Autowired private lateinit var objectMapper: ObjectMapper
+    @Autowired
+    private lateinit var customerRepository: CustomerRepository
+
+    @Autowired
+    private lateinit var mockMvc: MockMvc
+
+    @Autowired
+    private lateinit var objectMapper: ObjectMapper
 
     companion object {
         const val URL: String = "/api/customers"
     }
-
-    @BeforeEach
-    fun setup()  = customerRepository.deleteAll()
 
     @AfterEach
     fun tearDown() = customerRepository.deleteAll()
