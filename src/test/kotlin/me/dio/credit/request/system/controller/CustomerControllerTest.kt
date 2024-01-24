@@ -1,19 +1,18 @@
 package me.dio.credit.request.system.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import jakarta.validation.constraints.NotEmpty
-import jakarta.validation.constraints.NotNull
+import jakarta.persistence.EntityNotFoundException
 import me.dio.credit.request.system.dto.CustomerDTO
 import me.dio.credit.request.system.dto.CustomerUpdateDTO
 import me.dio.credit.request.system.model.Customer
 import me.dio.credit.request.system.repository.CustomerRepository
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.dao.DataAccessException
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
@@ -21,6 +20,7 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
+import org.springframework.web.bind.MethodArgumentNotValidException
 import java.math.BigDecimal
 
 @SpringBootTest
@@ -80,11 +80,11 @@ class CustomerControllerTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(customerDTO)))
             .andExpect(MockMvcResultMatchers.status().isConflict)
-            .andExpect(MockMvcResultMatchers.jsonPath("$.title").value("Constraint violated"))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.title").value(DataIntegrityViolationException::class.java.toString()))
             .andExpect(MockMvcResultMatchers.jsonPath("$.timestamp").exists())
             .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(409))
             .andExpect(MockMvcResultMatchers.jsonPath("$.exception")
-                .value("class org.springframework.dao.DataIntegrityViolationException"))
+                .value(DataIntegrityViolationException::class.java.toString()))
             .andExpect(MockMvcResultMatchers.jsonPath("$.details[*]").isNotEmpty)
             .andDo(MockMvcResultHandlers.print())
     }
@@ -100,11 +100,11 @@ class CustomerControllerTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(customerDTO)))
             .andExpect(MockMvcResultMatchers.status().isBadRequest)
-            .andExpect(MockMvcResultMatchers.jsonPath("$.title").value("Invalid argument"))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.title").value(MethodArgumentNotValidException::class.java.toString()))
             .andExpect(MockMvcResultMatchers.jsonPath("$.timestamp").exists())
             .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(400))
             .andExpect(MockMvcResultMatchers.jsonPath("$.exception")
-                .value("class org.springframework.web.bind.MethodArgumentNotValidException"))
+                .value(MethodArgumentNotValidException::class.java.toString()))
             .andExpect(MockMvcResultMatchers.jsonPath("$.details[*]").isNotEmpty)
             .andDo(MockMvcResultHandlers.print())
     }
@@ -132,17 +132,17 @@ class CustomerControllerTest {
         mockMvc
             .perform(MockMvcRequestBuilders.get("$URL/0"))
             .andExpect(MockMvcResultMatchers.status().isBadRequest)
-            .andExpect(MockMvcResultMatchers.jsonPath("$.title").value("Business exception"))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.title").value(EntityNotFoundException::class.java.toString()))
             .andExpect(MockMvcResultMatchers.jsonPath("$.timestamp").exists())
             .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(400))
             .andExpect(MockMvcResultMatchers.jsonPath("$.exception")
-                .value("class me.dio.credit.request.system.exception.BusinessException"))
+                .value(EntityNotFoundException::class.java.toString()))
             .andExpect(MockMvcResultMatchers.jsonPath("$.details[*]").isNotEmpty)
             .andDo(MockMvcResultHandlers.print())
     }
 
     @Test
-    fun `should delete customer`() {
+    fun `should indicate success with an empty response`() {
         val id: Long = customerRepository.save(buildCustomerDTO().toEntity()).id!!
 
         mockMvc
@@ -152,15 +152,15 @@ class CustomerControllerTest {
     }
 
     @Test
-    fun `should not delete customer, returning exception details with status code 400`() {
+    fun `should not delete customer, informing specified id is not in the records`() {
         mockMvc
             .perform(MockMvcRequestBuilders.delete("$URL/0"))
             .andExpect(MockMvcResultMatchers.status().isBadRequest)
-            .andExpect(MockMvcResultMatchers.jsonPath("$.title").value("Business exception"))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.title").value(EntityNotFoundException::class.java.toString()))
             .andExpect(MockMvcResultMatchers.jsonPath("$.timestamp").exists())
             .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(400))
             .andExpect(MockMvcResultMatchers.jsonPath("$.exception")
-                .value("class me.dio.credit.request.system.exception.BusinessException"))
+                .value(EntityNotFoundException::class.java.toString()))
             .andExpect(MockMvcResultMatchers.jsonPath("$.details[*]").isNotEmpty)
             .andDo(MockMvcResultHandlers.print())
     }
@@ -197,14 +197,24 @@ class CustomerControllerTest {
 
     @Test
     fun `should not update customer, retuning exception details and status code 400`() {
+        val updateDTO: CustomerUpdateDTO = CustomerUpdateDTO(
+            firstName = "Cami",
+            lastName = "Cavalcante dos Reis",
+            income = BigDecimal.valueOf(2500.0),
+            zipCode = "111111",
+            street =  "Rua da Joaninha, 1910"
+        )
+
         mockMvc
-            .perform(MockMvcRequestBuilders.delete("$URL/0"))
+            .perform(MockMvcRequestBuilders
+                .patch("$URL?customerId=1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(updateDTO)))
             .andExpect(MockMvcResultMatchers.status().isBadRequest)
-            .andExpect(MockMvcResultMatchers.jsonPath("$.title").value("Business exception"))
             .andExpect(MockMvcResultMatchers.jsonPath("$.timestamp").exists())
             .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(400))
             .andExpect(MockMvcResultMatchers.jsonPath("$.exception")
-                .value("class me.dio.credit.request.system.exception.BusinessException"))
+                .value(EntityNotFoundException::class.java.toString()))
             .andExpect(MockMvcResultMatchers.jsonPath("$.details[*]").isNotEmpty)
             .andDo(MockMvcResultHandlers.print())
     }

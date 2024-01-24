@@ -1,5 +1,6 @@
 package me.dio.credit.request.system.exception
 
+import jakarta.persistence.EntityNotFoundException
 import org.springframework.dao.DataAccessException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -23,7 +24,7 @@ class RestExceptionHandler {
 
         return ResponseEntity(
             ExceptionDetails(
-                title = "Invalid argument",
+                title = exception.javaClass.toString(),
                 timestamp = LocalDateTime.now(),
                 status = HttpStatus.BAD_REQUEST.value(),
                 exception = exception.javaClass.toString(),
@@ -36,7 +37,7 @@ class RestExceptionHandler {
     fun handleDataAccessException(exception: DataAccessException): ResponseEntity<ExceptionDetails> {
         return ResponseEntity(
             ExceptionDetails(
-                title = "Constraint violated",
+                title = exception.javaClass.toString(),
                 timestamp = LocalDateTime.now(),
                 status = HttpStatus.CONFLICT.value(),
                 exception = exception.javaClass.toString(),
@@ -45,11 +46,11 @@ class RestExceptionHandler {
         )
     }
 
-    @ExceptionHandler(BusinessException::class)
-    fun handleBusinessException(exception: BusinessException): ResponseEntity<ExceptionDetails> {
+    @ExceptionHandler(EntityNotFoundException::class)
+    fun handleEntityNotFoundException(exception: EntityNotFoundException): ResponseEntity<ExceptionDetails> {
         return ResponseEntity(
             ExceptionDetails(
-                title = "Business exception",
+                title = exception.javaClass.toString(),
                 timestamp = LocalDateTime.now(),
                 status = HttpStatus.BAD_REQUEST.value(),
                 exception = exception.javaClass.toString(),
@@ -59,10 +60,10 @@ class RestExceptionHandler {
     }
 
     @ExceptionHandler(IllegalArgumentException::class)
-    fun handleBusinessException(exception: IllegalArgumentException): ResponseEntity<ExceptionDetails> {
+    fun handleIllegalArgumentException(exception: IllegalArgumentException): ResponseEntity<ExceptionDetails> {
         return ResponseEntity(
             ExceptionDetails(
-                title = "Illegal argument provided",
+                title = exception.javaClass.toString(),
                 timestamp = LocalDateTime.now(),
                 status = HttpStatus.BAD_REQUEST.value(),
                 exception = exception.javaClass.toString(),

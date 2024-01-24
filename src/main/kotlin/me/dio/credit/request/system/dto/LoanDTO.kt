@@ -2,6 +2,7 @@ package me.dio.credit.request.system.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.Future
+import jakarta.validation.constraints.FutureOrPresent
 import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotNull
@@ -20,7 +21,7 @@ data class LoanDTO(
     val creditAmount: BigDecimal,
 
     @field:NotNull(message = "Field dateOfFirstInstallment cannot be empty")
-    @field:Future
+    @field:FutureOrPresent
     @field:Schema(
         description = "The date for the first installment must be before 3 months from the day of its negotiation",
         example = "yyyy-mm-dd"

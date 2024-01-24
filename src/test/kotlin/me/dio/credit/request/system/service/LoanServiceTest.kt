@@ -4,19 +4,21 @@ import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
+import io.mockk.just
+import io.mockk.runs
 import io.mockk.verify
+import jakarta.persistence.EntityNotFoundException
 import me.dio.credit.request.system.enummeration.Status
-import me.dio.credit.request.system.exception.BusinessException
+import me.dio.credit.request.system.model.Address
 import me.dio.credit.request.system.model.Customer
 import me.dio.credit.request.system.model.Loan
-import me.dio.credit.request.system.repository.CustomerRepository
 import me.dio.credit.request.system.repository.LoanRepository
 import me.dio.credit.request.system.service.impl.CustomerService
 import me.dio.credit.request.system.service.impl.LoanService
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.springframework.test.context.ActiveProfiles
+import org.mockito.ArgumentMatchers
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDate
@@ -31,17 +33,31 @@ class LoanServiceTest {
     @MockK lateinit var customerService: CustomerService
 
     @Test
-    fun `save(loan) should return the loan that was given as an argument`() {
+    fun `save(loan) should return the loan with an actual customer object attached`() {
         val fakeLoan = buildLoan(customer = Customer(id = 0))
 
-        every { loanRepository.save(fakeLoan) } returns fakeLoan
-        every { customerService.findById(any()) } returns fakeLoan.customer
+        val retrievedCustomer = Customer(
+            firstName = "Camila",
+            lastName = "Silva",
+            cpf = "41693009048",
+            email = "camila@gmail.com",
+            income = BigDecimal.valueOf(2500.0),
+            password = "P4s5wORd",
+            address = Address("04662", "Rua da Camila, 205"),
+            id = 0
+        )
+
+        val retrievedLoan = fakeLoan.copy(customer = retrievedCustomer)
+
+        every { loanRepository.save(retrievedLoan) } returns retrievedLoan
+
+        every { customerService.findById(0) } returns retrievedCustomer
 
         val actual = loanService.save(fakeLoan)
 
-        Assertions.assertThat(actual).isSameAs(fakeLoan)
-        verify(exactly = 1) { loanRepository.save(fakeLoan) }
-        verify(exactly = 1) { customerService.findById(any()) }
+        Assertions.assertThat(actual).isSameAs(retrievedLoan)
+        verify(exactly = 1) { loanRepository.save(retrievedLoan) }
+        verify(exactly = 1) { customerService.findById(0) }
     }
 
     @Test
@@ -59,45 +75,74 @@ class LoanServiceTest {
 
     @Test
     fun `findByCreditCode(customerId, creditCode) should return a loan`() {
-        val fakeCreditCode = UUID.randomUUID()
-        val fakeCustomerId = 0L
-        val fakeLoan = buildLoan(creditCode = fakeCreditCode, customer = Customer(id = fakeCustomerId))
+        val customer = Customer(id = 1)
+        val loan = buildLoan(creditCode = UUID.randomUUID(), customer = customer)
 
-        every { loanRepository.findByCreditCode(fakeCreditCode) } returns fakeLoan
+        every { customerService.findById(customer.id!!) } returns customer
+        every { loanRepository.findByCreditCode(loan.creditCode) } returns loan
 
-        val actual = loanService.findByCreditCode(fakeCustomerId, fakeCreditCode)
+        val actual = loanService.findByCreditCode(customer.id!!, loan.creditCode)
 
-        Assertions.assertThat(actual).isSameAs(fakeLoan)
-        verify(exactly = 1) { loanRepository.findByCreditCode(fakeCreditCode) }
+        Assertions.assertThat(actual).isSameAs(loan)
+        verify(exactly = 1) { customerService.findById(customer.id!!) }
+        verify(exactly = 1) { loanRepository.findByCreditCode(loan.creditCode) }
     }
 
     @Test
-    fun `findByCreditCode(customerId, creditCode) should throw a Business Exception when given a credit code that doesn't belong to any loan`() {
-        val unassociatedCreditCode = UUID.randomUUID()
+    fun `findByCreditCode(customerId, creditCode) should throw an Entity Not Found Exception when given a credit code that doesn't belong to any loan`() {
+        val customer = Customer(id = 1)
+        val unassociatedCreditCode: UUID = UUID.randomUUID()
 
+        every { customerService.findById(customer.id!!) } returns customer
         every { loanRepository.findByCreditCode(unassociatedCreditCode) } returns null
 
-        Assertions.assertThatExceptionOfType(BusinessException::class.java)
-            .isThrownBy { loanService.findByCreditCode(customerId = 0L, unassociatedCreditCode) }
+        Assertions.assertThatExceptionOfType(EntityNotFoundException::class.java)
+            .isThrownBy { loanService.findByCreditCode(customer.id!!, unassociatedCreditCode) }
             .withMessage("Could not find any loan with credit code of $unassociatedCreditCode")
 
+        verify(exactly = 1) { customerService.findById(customer.id!!) }
         verify(exactly = 1) { loanRepository.findByCreditCode(unassociatedCreditCode) }
     }
 
     @Test
     fun `findByCreditCode(customerId, creditCode) should throw an Illegal Argument Exception when the given customerId doesn't match that of the retrieved loan`() {
-        val associatedCustomerId = 0L
-        val associatedCreditCode = UUID.randomUUID()
-        val fakeLoan = buildLoan(creditCode = associatedCreditCode, customer = Customer(id = associatedCustomerId))
-        val unassociatedCustomerId = 1L
+        val customer1 = Customer(id = 1)
+        val customer2 = Customer(id = 2)
+        val loan = buildLoan(creditCode = UUID.randomUUID(), customer = Customer(id = 1L))
 
-        every { loanRepository.findByCreditCode(associatedCreditCode) } returns fakeLoan
+        every { customerService.findById(customer2.id!!) } returns customer2
+        every { loanRepository.findByCreditCode(loan.creditCode) } returns loan
 
         Assertions.assertThatExceptionOfType(IllegalArgumentException::class.java)
-            .isThrownBy { loanService.findByCreditCode(unassociatedCustomerId, associatedCreditCode) }
-            .withMessage("Customer id of $unassociatedCustomerId does not match that of the loan of credit code $associatedCreditCode")
+            .isThrownBy { loanService.findByCreditCode(customer2.id!!, loan.creditCode) }
+            .withMessage("Customer id of ${customer2.id} does not match that of the loan of credit code ${loan.creditCode}")
 
-        verify(exactly = 1) { loanRepository.findByCreditCode(associatedCreditCode) }
+        verify(exactly = 1) { loanRepository.findByCreditCode(loan.creditCode) }
+    }
+
+    @Test
+    fun `should look for a loan to delete it afterwards`() {
+        val loan: Loan = buildLoan(
+            id = 1,
+            customer = Customer(
+                firstName = "Camila",
+                lastName = "Silva",
+                cpf = "41693009048",
+                email = "camila@gmail.com",
+                income = BigDecimal.valueOf(2500.0),
+                password = "P4s5wORd",
+                address = Address("04662", "Rua da Camila, 205"),
+                id = 0
+            )
+        )
+
+        every { loanRepository.findById(loan.id!!) } returns Optional.of(loan)
+        every { loanRepository.delete(loan) } just runs
+
+        loanService.delete(loan.id!!)
+
+        verify(exactly = 1) { loanRepository.findById(loan.id!!) }
+        verify(exactly = 1) { loanRepository.delete(loan) }
     }
 
     private fun generateNumberRandomly(lowerLimit: Int = 0, upperLimit: Int = 10000, decimalPlaces: Int = 0): BigDecimal =

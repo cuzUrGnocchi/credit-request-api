@@ -7,20 +7,15 @@ import io.mockk.junit5.MockKExtension
 import io.mockk.just
 import io.mockk.runs
 import io.mockk.verify
-import me.dio.credit.request.system.enummeration.Status
-import me.dio.credit.request.system.exception.BusinessException
+import jakarta.persistence.EntityNotFoundException
 import me.dio.credit.request.system.model.Address
 import me.dio.credit.request.system.model.Customer
-import me.dio.credit.request.system.model.Loan
 import me.dio.credit.request.system.repository.CustomerRepository
 import me.dio.credit.request.system.service.impl.CustomerService
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.springframework.test.context.ActiveProfiles
 import java.math.BigDecimal
-import java.math.RoundingMode
-import java.time.LocalDate
 import java.util.*
 import kotlin.random.Random
 
@@ -64,9 +59,9 @@ class CustomerServiceTest {
 
         every { customerRepository.findById(fakeId) } returns Optional.empty()
 
-        Assertions.assertThatExceptionOfType(BusinessException::class.java)
+        Assertions.assertThatExceptionOfType(EntityNotFoundException::class.java)
             .isThrownBy { customerService.findById(fakeId) }
-            .withMessage("Id $fakeId not found")
+            .withMessage("Customer of id $fakeId not found")
 
         verify(exactly = 1) { customerRepository.findById(fakeId) }
     }

@@ -5,6 +5,10 @@ import java.util.UUID
 
 interface ILoanService {
     fun save(loan: Loan): Loan
+
     fun findAllByCustomer(customerId: Long): List<Loan>
+
     fun findByCreditCode(customerId: Long, creditCode: UUID): Loan
+
+    fun delete(id: Long)
 }

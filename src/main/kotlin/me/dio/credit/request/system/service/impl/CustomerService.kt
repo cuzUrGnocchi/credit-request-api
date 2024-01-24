@@ -1,6 +1,6 @@
 package me.dio.credit.request.system.service.impl
 
-import me.dio.credit.request.system.exception.BusinessException
+import jakarta.persistence.EntityNotFoundException
 import me.dio.credit.request.system.model.Customer
 import me.dio.credit.request.system.repository.CustomerRepository
 import org.springframework.stereotype.Service
@@ -15,7 +15,7 @@ class CustomerService(
 
     override fun findById(id: Long): Customer =
         customerRepository.findById(id).orElseThrow {
-            throw BusinessException("Id $id not found")
+            throw EntityNotFoundException("Customer of id $id not found")
         }
 
     override fun delete(id: Long) =
